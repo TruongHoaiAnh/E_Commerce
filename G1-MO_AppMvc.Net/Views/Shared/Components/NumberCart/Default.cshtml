@@ -1,0 +1,11 @@
+﻿@model List<App.Model.ShoppingCartItem>
+@if(Model != null && Model.Count()>0)
+{
+    //href # gì đó nếu muốn di chuyển đến tài nguyên khác
+    <a href="cart"><i class="fa fa-shopping-bag"></i> <span>@Model.Count()</span></a>
+}
+else
+{
+    <a href="cart"><i class="fa fa-shopping-bag"></i> <span>0</span></a>
+}
+ 

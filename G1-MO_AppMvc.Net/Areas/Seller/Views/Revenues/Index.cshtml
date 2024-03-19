@@ -1,0 +1,132 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+@model App.Model.YourTime
+<a asp-area="Seller" asp-action="ExportOrder" asp-controller="Excel" class="btn btn-success" onclick="exportSuccess()" title="Export data to Excel">Export Excel</a>
+
+<script>
+	function exportSuccess() {
+		alert('Export success!');
+	}
+</script>
+<div class="container col-md-8">
+    <form asp-action="Index" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label class="control-label">Start Date</label>
+        <input type="date" asp-for="startDate" class="form-control" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+        <span asp-validation-for="startDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label class="control-label">End Date</label>
+        <input type="date" asp-for="endDate" class="form-control" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+        <span asp-validation-for="endDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Select method</label>
+        <select class="form-control" name="method" id="methodSelect">
+            <option value = "1">Your choose</option>
+            <option value = "2" >Current Day</option>
+                <option value = "3" >Current Month</option>
+                <option value = "4" >Current Year</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Enter" class="btn btn-danger" />
+    </div>
+    </form>
+</div>
+@if (ViewBag.viewModelList != null)
+{
+<div>
+    <canvas id="revenueChart"></canvas>
+</div>
+}
+@section Scripts {
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var methodSelect = document.getElementById("methodSelect");
+        var startDateInput = document.querySelector('input[name="startDate"]');
+        var endDateInput = document.querySelector('input[name="endDate"]');
+        
+        // Kiểm tra giá trị mặc định của select và chuyển đổi các trường ngày thành readonly hoặc vô hiệu hóa
+        if (methodSelect.value >= 2 && methodSelect.value <= 4) {
+            startDateInput.readOnly = true;
+            endDateInput.readOnly = true;
+        }
+        
+        // Lắng nghe sự kiện onchange của select
+        methodSelect.addEventListener("change", function () {
+            var methodValue = parseInt(this.value);
+            
+            if (methodValue >= 2 && methodValue <= 4) {
+                startDateInput.readOnly = true;
+                endDateInput.readOnly = true;
+            } else {
+                startDateInput.readOnly = false;
+                endDateInput.readOnly = false;
+            }
+        });
+    });
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lấy phần tử select
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            // Chuyển dữ liệu từ danh sách listChartDay thành mảng JavaScript
+            var data = [];
+            var total = [];
+            @foreach (var item in ViewBag.viewModelList)
+            {
+                var listItem = item as SelectListItem;
+                if (listItem != null)
+                {
+                    <text>data.push('@listItem.Text');</text>
+                    <text>total.push('@listItem.Value');</text>
+                }
+            }
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data,
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: total,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: function (value, context) {
+                                return value; // Hiển thị giá trị của cột
+                            },
+                            display: function (context) {
+                                return context.dataset.data[context.dataIndex] > 0; // Chỉ hiển thị nhãn nếu giá trị của cột lớn hơn 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gọi hàm toggleInputs để xử lý trạng thái ban đầu
+            console.log(total);
+            console.log(data);
+        });
+
+    </script>
+    
+}

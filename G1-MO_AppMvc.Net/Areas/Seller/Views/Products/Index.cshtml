@@ -1,0 +1,70 @@
+﻿@{
+	ViewData["Title"] = "Products list";
+
+}
+@model List<App.Model.ProJoinCat>
+
+<h1>Products List</h1>
+<hr />
+<a asp-area="Seller" asp-action="ExportProduct" asp-controller="Excel" class="btn btn-success" onclick="exportSuccess()" title="Export data to Excel">Export Excel</a>
+
+<script>
+	function exportSuccess() {
+		alert('Export success!');
+	}
+</script>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th class="col-md-4">Product Name</th>
+					<th class="col-md-4">Description</th>
+					<th class="col-md-4">Category Name</th>
+					<th>Action</th>
+					<th>Images</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td>
+							@item.products.Name
+						</td>
+						<td>
+							@item.products.Description
+						</td>
+						<td>
+							@item.categories.NameCate
+						</td>
+
+						<td>
+							<div class="btn-group mr-2" role="group">
+								<a asp-action="Details" asp-route-id="@item.products.IdPro" class="btn btn-primary">Details</a>
+								<a asp-action="Edit" asp-route-id="@item.products.IdPro" class="btn btn-success">Edit</a>
+								<a asp-action="Delete" asp-route-id="@item.products.IdPro" class="btn btn-danger">Delete</a>
+							</div>
+						</td>
+						<td>
+							<a href="#" class="btn btn-danger product-image-btn" data-id="@item.products.IdPro">Product Image</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<hr />
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			$('.product-image-btn').click(function () {
+				var id = $(this).data('id');
+				window.location.href = '/seller/product/ProImage/' + id;
+			});
+		});
+	</script>
+}
